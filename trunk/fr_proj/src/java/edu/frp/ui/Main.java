@@ -12,9 +12,11 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		try {
-			Image i = new Image("C:\\Users\\Saulo\\Pictures\\altair.png");
+			Image i = new Image("C:\\Users\\Saulo\\Pictures\\Avatares e Assinaturas\\altair.jpg");
 			i.write("C:\\Users\\Saulo\\Pictures\\naosalvo.jpg", Image.JPEG);
 			i.getLayerMatrix(Image.RED_LAYER);
+			String result = i.isColored() ? "colorida" : "cinza";
+			System.out.println(result);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

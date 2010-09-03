@@ -1,7 +1,6 @@
 package edu.frp.image;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -16,7 +15,7 @@ import edu.frp.exception.UnsupportedImageTypeException;
  */
 public class Image {
 	
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	private static Logger logger = Logger.getLogger(Image.class.getName());
 
 	public static String JPEG = "jpg";
 	public static String BMP = "bmp";

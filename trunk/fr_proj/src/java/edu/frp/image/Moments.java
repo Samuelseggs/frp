@@ -10,10 +10,11 @@ import java.util.logging.Logger;
  */
 public class Moments {
 
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	private static Logger logger = Logger.getLogger(Moments.class.getName());
 	
 	public static double getRawMoment(int p, int q, double[][] matrix) {
 		double m = 0;
+		logger.finest("Calculating raw moment for p="+p+" and q="+q);
 		for (int i = 0, k = matrix.length; i < k; i++) {
 			for (int j = 0, l = matrix[i].length; j < l; j++) {
 				m += Math.pow(i, p) * Math.pow(j, q) * matrix[i][j];
@@ -37,7 +38,7 @@ public class Moments {
 		return mc;
 	}
 
-	public static double covarianceXY(int p, int q, double[][] matrix) {
+	public static double getCovarianceXY(int p, int q, double[][] matrix) {
 		double mc00 = Moments.getCentralMoment(0, 0, matrix);
 		double mc11 = Moments.getCentralMoment(1, 1, matrix);
 		return mc11 / mc00;
@@ -69,6 +70,13 @@ public class Moments {
 		return mc02 / mc00;
 	}
 
+	/**
+	 * Normalized Central Moment
+	 * @param p
+	 * @param q
+	 * @param matrix the pixel map
+	 * @return Normalized Central Moment n_pq
+	 */
 	public static double getNormalizedCentralMoment(int p, int q, double[][] matrix) {
 		double gama = ((p + q) / 2) + 1;
 		double mpq = Moments.getCentralMoment(p, q, matrix);
@@ -76,6 +84,12 @@ public class Moments {
 		return mpq / m00gama;
 	}
 	
+	/**
+	 * Hu invariant moments
+	 * @param matrix the pixel map
+	 * @param n the Hu moment horder
+	 * @return n-order Hu moment
+	 */
 	public static double getHuMoment (double[][] matrix,int n) {
 		double result = 0.0;
 		
