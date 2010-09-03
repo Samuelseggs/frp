@@ -1,6 +1,7 @@
 package edu.frp.image;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -46,7 +47,6 @@ public class Image {
 				this.width = bi.getWidth();
 				this.height = bi.getHeight();
 				this.type = bi.getType();
-				
 				this.fillImageMatrix(bi);
 				
 				logger.info("Image object created (W:"+this.width+"px H:"+this.height+"px T:"+this.type+")");	
@@ -138,7 +138,7 @@ public class Image {
 	 * @return double[][] containing pixel values
 	 */
 	public double[][] getLayerMatrix(int layer) {
-		double[][] resultMatrix = new double[this.width][this.height];
+		double[][] resultMatrix = new double[this.height][this.width];
 		
 		for (int w = 0; w < this.width; w++) {
 			for (int h = 0; h < this.height; h++) {
@@ -149,17 +149,18 @@ public class Image {
 	}
 	
 	/**
-	 * @return the matrix
+	 * Test if image is colored based in the BufferedImage.getType()
+	 * @return true if colored, false if grayscale
+	 */
+	public boolean isColored() {
+		return (this.type < 10)&&(this.type!=0);
+	}
+	
+	/**
+	 * @return the matrix with pixel map
 	 */
 	public double[][][] getMatrix() {
 		return matrix;
-	}
-
-	/**
-	 * @param matrix the matrix to set
-	 */
-	public void setMatrix(double[][][] matrix) {
-		this.matrix = matrix;
 	}
 
 	/**
@@ -170,13 +171,6 @@ public class Image {
 	}
 
 	/**
-	 * @param width the width to set
-	 */
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	/**
 	 * @return the height
 	 */
 	public int getHeight() {
@@ -184,23 +178,10 @@ public class Image {
 	}
 
 	/**
-	 * @param height the height to set
-	 */
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	/**
 	 * @return the type
+	 * @see BufferedImage
 	 */
 	public int getType() {
 		return type;
-	}
-
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(int type) {
-		this.type = type;
 	}
 }
