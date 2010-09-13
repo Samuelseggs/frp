@@ -1,4 +1,4 @@
-package edu.frp.image;
+package edu.frp.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,6 +20,7 @@ public class Image {
 	public static String JPEG = "jpg";
 	public static String BMP = "bmp";
 	public static String GIF = "gif";
+	public static String PMG = "pgm";
 
 	public static int RED_LAYER = 0;
 	public static int BLUE_LAYER = 1;
@@ -64,6 +65,13 @@ public class Image {
 		boolean result = path.endsWith("." + BMP)
 						|| path.endsWith("." + JPEG)
 						|| path.endsWith("." + GIF);
+		
+		if (result) {
+			return;
+		} else if (path.endsWith("." + PMG)) {
+			
+		}
+		
 		if (!result) {
 			String msg = "Unsupported image type/extension: " + path.substring(path.lastIndexOf("."), path.length());
 			throw new UnsupportedImageTypeException(msg);
@@ -156,6 +164,7 @@ public class Image {
 	}
 	
 	/**
+	 * Dimensions: [Height][Width][Layer]
 	 * @return the matrix with pixel map
 	 */
 	public double[][][] getMatrix() {
