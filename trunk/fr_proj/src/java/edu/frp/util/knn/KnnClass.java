@@ -2,31 +2,29 @@ package edu.frp.util.knn;
 
 import java.util.ArrayList;
 
-import edu.frp.util.Image;
-
-public class KnnImageClass {
+public class KnnClass {
 
 	private String name;
 	
-	private ArrayList<Image> images;
+	private ArrayList<Object> objects;
 	
 	/**
 	 * Class constructor
 	 * @param name the name of the class
 	 */
-	public KnnImageClass (String name) {
+	public KnnClass (String name) {
 		this.setName(name);
-		this.setImages(new ArrayList<Image> ());
+		this.setImages(new ArrayList<Object> ());
 	}
 	
 	/**
 	 * Class constructor
 	 * @param name the name of the class
-	 * @param images the images that compose the class
+	 * @param data that compose the class
 	 */
-	public KnnImageClass (String name, ArrayList<Image> images) {
+	public KnnClass (String name, ArrayList<Object> objects) {
 		this.setName(name);
-		this.setImages(images);
+		this.setImages(objects);
 	}
 
 	/**
@@ -44,17 +42,17 @@ public class KnnImageClass {
 	}
 
 	/**
-	 * @param images the images to set
+	 * @param objects the images to set
 	 */
-	public void setImages(ArrayList<Image> images) {
-		this.images = images;
+	public void setImages(ArrayList<Object> objects) {
+		this.objects = objects;
 	}
 
 	/**
 	 * @return the images
 	 */
-	public ArrayList<Image> getImages() {
-		return images;
+	public ArrayList<Object> getObjects() {
+		return objects;
 	}
 
 }

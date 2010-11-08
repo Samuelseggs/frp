@@ -49,7 +49,6 @@ public class Image {
 				this.type = bi.getType();
 				this.fillImageMatrix(bi);
 				
-				logger.info("Image object created (W:"+this.width+"px H:"+this.height+"px T:"+this.type+")");	
 			} catch (UnsupportedImageTypeException e) {
 				logger.severe(e.getMessage());
 				e.printStackTrace();
@@ -192,4 +191,19 @@ public class Image {
 	public int getType() {
 		return type;
 	}
+
+	/**
+	 * @param matrix the matrix to set
+	 */
+	public void setMatrix(double[][][] matrix) {
+		this.matrix = matrix;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(int type) {
+		this.type = type;
+	}
+	
 }
