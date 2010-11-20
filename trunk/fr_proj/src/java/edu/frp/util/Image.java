@@ -54,6 +54,18 @@ public class Image {
 				e.printStackTrace();
 			}
 	}
+	
+	/**
+	 * Image from BufferedImage
+	 * @param bi
+	 * @throws IOException
+	 */
+	public Image (BufferedImage bi) throws IOException {
+			this.width = bi.getWidth();
+			this.height = bi.getHeight();
+			this.type = bi.getType();
+			this.fillImageMatrix(bi);
+	}
 
 	/**
 	 * Checks if the given path points to a valid image file
