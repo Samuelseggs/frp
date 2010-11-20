@@ -1,18 +1,21 @@
 package edu.frp.util;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+
 import Jama.Matrix;
-import edu.frp.util.knn.KnnClass;
-import edu.frp.util.knn.KnnResult;
 
 /**
  * Util
@@ -185,108 +188,6 @@ public class Util {
 	}
 
 	/**
-	 * Generic Distance
-	 * 
-	 * @param mat1
-	 *            the first matrix input
-	 * @param mat2
-	 *            the second matrix input
-	 * @param o
-	 *            the Order of distance (2=Euclidian, 0=Minkowiski)
-	 * @return double
-	 */
-	public static double calcDistance(double[][] mat1, double[][] mat2, double o) {
-		double distance = 0.0f;
-
-		int h = mat1.length;
-		int w = mat1[0].length;
-
-		// Test pixel maps sizes
-		if (mat2.length != h || mat2[0].length != w) {
-			throw new IllegalArgumentException(
-					"Input images cannot be compared due to different sizes.");
-		}
-
-		for (int j = 0; j < w; j++) {
-			for (int i = 0; i < h; i++) {
-				distance = distance
-						+ Math.abs(Math.pow(mat1[i][j] - mat2[i][j], o));
-			}
-		}
-
-		distance = Math.pow(distance, 1 / o);
-
-		return distance;
-	}
-
-	/**
-	 * Calculates KNN
-	 * 
-	 * @param data
-	 *            the database classes
-	 * @param test
-	 *            the test input image
-	 * @param n
-	 *            the n nearest neighbors
-	 * @param o
-	 *            the order to be used in distance calculus
-	 * @return the nearest neighbor
-	 */
-	public static KnnClass knn(KnnClass[] data, Matrix test, int n, double o) {
-		logger.info("Calculating " + n + " nearest neighbours");
-		long startTime = System.currentTimeMillis();
-		ArrayList<KnnResult> distance = new ArrayList<KnnResult>();
-
-		for (int classIndex = 0; classIndex < data.length; classIndex++) {
-			Iterator<Object> classIterator = data[classIndex].getObjects()
-					.iterator();
-			while (classIterator.hasNext()) {
-				distance.add(new KnnResult(data[classIndex].getName(),
-						calcDistance(
-								((Matrix) classIterator.next()).getArray(),
-								test.getArray(), o)));
-			}
-		}
-
-		Collections.sort(distance);
-
-		HashMap<KnnResult, Integer> nearestNeighbors = new HashMap<KnnResult, Integer>();
-		for (int i = 0; i < n; i++) {
-			KnnResult currentResult = distance.get(i);
-			if (nearestNeighbors.get(nearestNeighbors) == null) {
-				nearestNeighbors.put(currentResult, 1);
-			} else {
-				nearestNeighbors.put(currentResult, nearestNeighbors
-						.get(currentResult));
-			}
-		}
-
-		Iterator<Entry<KnnResult, Integer>> nearestNeighborIterator = nearestNeighbors
-				.entrySet().iterator();
-		KnnResult nearest = (KnnResult) nearestNeighborIterator.next().getKey();
-
-		while (nearestNeighborIterator.hasNext()) {
-			KnnResult next = (KnnResult) nearestNeighborIterator.next()
-					.getKey();
-			if (nearest.compareTo(next) > 0) {
-				nearest = next;
-			}
-		}
-
-		for (int i = 0; i < data.length; i++) {
-			KnnClass currentClass = data[i];
-			if (currentClass.getName().equals(nearest.getName())) {
-				long finalTime = System.currentTimeMillis() - startTime;
-				logger.info("Class found in " + finalTime + "ms.");
-				return currentClass;
-			}
-		}
-		long finalTime = System.currentTimeMillis() - startTime;
-		logger.info("No class found after " + finalTime + "ms.");
-		return null;
-	}
-
-	/**
 	 * Normalizes matrix to 8 values
 	 * 
 	 * @param matrix
@@ -337,6 +238,12 @@ public class Util {
 		return result;
 	}
 
+	/**
+	 * Build covariance matrix for matrix m
+	 * 
+	 * @param m
+	 * @return
+	 */
 	public static Matrix cvMatrix(Matrix m) {
 		int imageWidth = m.getColumnDimension();
 		int imageHeight = m.getRowDimension();
@@ -347,12 +254,6 @@ public class Util {
 		double[] cMeans = new double[imageWidth];
 		Arrays.fill(cMeans, 0d);
 
-		// Test
-		// double[][] pMap = new double[3][3];
-		// pMap[0][0]=1; pMap[0][1]=2; pMap[0][2]=3;
-		// pMap[1][0]=4; pMap[1][1]=5; pMap[1][2]=6;
-		// pMap[2][0]=7; pMap[2][1]=8; pMap[2][2]=9;
-
 		for (int w = 0; w < imageWidth; w++) {
 			for (int h = 0; h < imageHeight; h++) {
 				cMeans[w] = cMeans[w] + m.get(h, w);
@@ -362,23 +263,58 @@ public class Util {
 
 		// Covariance for each pair of variables x1 and x2
 		double[][] pMapT = m.transpose().getArray();
-		int newLength = imageWidth;
-		for (int i = 0; i < imageWidth; i++) {
-			double[] x1 = Arrays.copyOf(pMapT[i], newLength);
-			double mx1 = cMeans[i];
-			for (int j = i; j < imageWidth; j++) {
-				double[] x2 = Arrays.copyOf(pMapT[j], newLength);
-				double mx2 = cMeans[j];
+		System.out.println(pMapT.length + " " + pMapT[0].length);
+		DecimalFormat df = new DecimalFormat("0.00");
+
+		logger.info("Calculating covariance matrix...");
+		long startTime = System.currentTimeMillis();
+		for (int i = 0; i < imageHeight; i++) {
+			logger.finest("" + df.format(i * 100d / (imageHeight - 1)) + "%");
+			// double[] x1 = Arrays.copyOf(pMapT[i], newLength);
+			// double mx1 = cMeans[i];
+			for (int j = i; j < imageHeight; j++) {
+				// double[] x2 = Arrays.copyOf(pMapT[j], newLength);
+				// double mx2 = cMeans[j];
 				double v = 0d;
-				for (int k = 0; k < newLength; k++) {
-					v = v + ((x1[k] - mx1) * (x2[k] - mx2) / (imageHeight - 1));
+				for (int k = 0; k < imageWidth; k++) {
+
+					v = v
+							+ ((pMapT[k][i] - cMeans[i])
+									* (pMapT[k][j] - cMeans[j]) / (imageWidth - 1));
 				}
 
 				cvMatrix[i][j] = v;
 				cvMatrix[j][i] = v;
 			}
 		}
+		logger.info("Covariance matrix calculated in "
+				+ (System.currentTimeMillis() - startTime) + "ms.");
 		return new Matrix(cvMatrix);
+	}
+
+	/**
+	 * Normalize matrix (Mean centered matrix)
+	 * 
+	 * @param dataMatrix
+	 * @return Matrix
+	 */
+	public static Matrix normalizeMatrix(Matrix dataMatrix) {
+		double sum = 0d;
+		for (int i = 0; i < dataMatrix.getRowDimension(); i++) {
+			for (int j = 0; j < dataMatrix.getColumnDimension(); j++) {
+				sum = sum + dataMatrix.get(i, j);
+			}
+		}
+		// Mean value of matrix
+		double mean = sum
+				/ (dataMatrix.getRowDimension() * dataMatrix
+						.getColumnDimension());
+
+		// Mean centered image
+		Matrix mCDataMatrix = dataMatrix.minus(new Matrix(dataMatrix
+				.getRowDimension(), dataMatrix.getColumnDimension(), mean));
+
+		return mCDataMatrix;
 	}
 
 	/**
@@ -493,5 +429,43 @@ public class Util {
 		}
 		i.setMatrix(matrix);
 		return i;
+	}
+
+	public static Object readFromFile(String filePath) {
+		Object obj = null;
+		try {
+			FileInputStream f_in = new FileInputStream(filePath);
+			ObjectInputStream obj_in = new ObjectInputStream(f_in);
+			obj = obj_in.readObject();
+
+		} catch (FileNotFoundException e) {
+			logger.severe("File not found.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger
+					.severe("Could not read from file.");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			logger
+					.severe("Could not find class for file.");
+			e.printStackTrace();
+		}
+
+		return obj;
+	}
+
+	public static void saveToFile(Object obj, String outputFilePath) {
+		try {
+			FileOutputStream fOut = new FileOutputStream(outputFilePath);
+			ObjectOutputStream obj_out = new ObjectOutputStream(fOut);
+			obj_out.writeObject(obj);
+		} catch (FileNotFoundException e) {
+			logger.severe("File not found.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.severe("Could not write file " + outputFilePath + ".");
+			e.printStackTrace();
+		}
+
 	}
 }

@@ -1,12 +1,18 @@
 package edu.frp.util.knn;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class KnnClass {
+import Jama.Matrix;
+
+public class KnnClass implements Serializable {
+
+	
+	private static final long serialVersionUID = 6222371857035755863L;
 
 	private String name;
 	
-	private ArrayList<Object> objects;
+	private ArrayList<Matrix> objects;
 	
 	/**
 	 * Class constructor
@@ -14,7 +20,7 @@ public class KnnClass {
 	 */
 	public KnnClass (String name) {
 		this.setName(name);
-		this.setImages(new ArrayList<Object> ());
+		this.setImages(new ArrayList<Matrix> ());
 	}
 	
 	/**
@@ -22,7 +28,7 @@ public class KnnClass {
 	 * @param name the name of the class
 	 * @param data that compose the class
 	 */
-	public KnnClass (String name, ArrayList<Object> objects) {
+	public KnnClass (String name, ArrayList<Matrix> objects) {
 		this.setName(name);
 		this.setImages(objects);
 	}
@@ -44,14 +50,14 @@ public class KnnClass {
 	/**
 	 * @param objects the images to set
 	 */
-	public void setImages(ArrayList<Object> objects) {
+	public void setImages(ArrayList<Matrix> objects) {
 		this.objects = objects;
 	}
 
 	/**
 	 * @return the images
 	 */
-	public ArrayList<Object> getObjects() {
+	public ArrayList<Matrix> getObjects() {
 		return objects;
 	}
 
