@@ -15,9 +15,9 @@ public class EigenFace {
 	/**
 	 * Class constructor
 	 * @param image Image
-	 * @param tm PcaTransformMatrix
+	 * @param tm Matrix
 	 */
-	public EigenFace(Image image, PcaTransformMatrix tm) {
+	public EigenFace(Image image, Matrix tm) {
 		logger.info("Building eigenface...");
 		long startTime = System.currentTimeMillis();
 
@@ -25,7 +25,7 @@ public class EigenFace {
 		linearData[0] = new Matrix(image.getLayerMatrix(0)).getRowPackedCopy();
 
 		Matrix linearDataMatrixT = new Matrix(linearData).transpose();
-		Matrix transformMatrixT = tm.getTransformMatrix();
+		Matrix transformMatrixT = tm;
 		this.efMatrix = transformMatrixT.times(linearDataMatrixT);
 		long finalTime = (System.currentTimeMillis() - startTime);
 		logger.info("Eigenface built in " + finalTime + "ms.");

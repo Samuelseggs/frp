@@ -22,6 +22,13 @@ public class Knn {
 	private ArrayList<KnnClass> data;
 	private ArrayList<KnnResult> distance;
 	
+	/**
+	 * Class constructor
+	 * @param data
+	 * @param test
+	 * @param n
+	 * @param o
+	 */
 	public Knn (ArrayList<KnnClass> data, Matrix test, int n, double o) {
 		logger.info("Initializing Knn...");
 		this.data = data;
@@ -31,8 +38,9 @@ public class Knn {
 			Iterator<Matrix> classIterator = data.get(classIndex).getObjects()
 					.iterator();
 			while (classIterator.hasNext()) {
+				Matrix tempMatrix = (classIterator.next());
 				this.distance.add(new KnnResult(data.get(classIndex).getName(),
-						calcDistance((classIterator.next()).getArray(), test
+						calcDistance(tempMatrix.getArray(), test
 								.getArray(), o)));
 			}
 		}
@@ -41,6 +49,11 @@ public class Knn {
 		logger.info("Knn initialized.");
 	}
 	
+	/**
+	 * @param n
+	 * @param maxDist
+	 * @return
+	 */
 	public KnnClass getKnn (int n, double maxDist){
 		long startTime = System.currentTimeMillis();
 		HashMap<KnnResult, Integer> nearestNeighbors = new HashMap<KnnResult, Integer>();
@@ -66,12 +79,12 @@ public class Knn {
 			}
 		}
 
+		
 		for (int i = 0; i < data.size(); i++) {
 			KnnClass currentClass = data.get(i);
-			System.out.println(""+nearest.getDistance());
 			if ((nearest.getDistance() < maxDist) && (currentClass.getName().equals(nearest.getName()))) {
 				long finalTime = System.currentTimeMillis() - startTime;
-				logger.info("Class found in " + finalTime + "ms.");
+				logger.info("Class found in " + finalTime + "ms. Distance: " +nearest.getDistance()+".");
 				return currentClass;
 			}
 		}
@@ -80,7 +93,7 @@ public class Knn {
 		return null;
 	}
 	
-	public static double calcDistance(double[][] mat1, double[][] mat2, double o) {
+	private double calcDistance(double[][] mat1, double[][] mat2, double o) {
 		double distance = 0.0f;
 
 		int h = mat1.length;

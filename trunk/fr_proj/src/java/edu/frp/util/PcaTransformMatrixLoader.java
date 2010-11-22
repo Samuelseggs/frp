@@ -13,69 +13,43 @@ import Jama.Matrix;
  * @author Saulo (scsm@ecomp.poli.br)
  * @author Arlington (abr@ecomp.poli.br)
  */
-public class PcaTransformMatrix {
-	private static Logger logger = Logger.getLogger(PcaTransformMatrix.class
+public class PcaTransformMatrixLoader {
+	private static Logger logger = Logger.getLogger(PcaTransformMatrixLoader.class
 			.getName());
 
 	private static final long serialVersionUID = 3627512864882477843L;
-	private Matrix pCMatrix;
-	private double[][] linearData;
 
 	/**
-	 * @return the pCMatrix
+	 * 
+	 * @param filePath
+	 * @return
 	 */
-	public Matrix getTransformMatrix() {
-		return pCMatrix;
-	}
-
-	public PcaTransformMatrix(String filePath) {
-		// Object obj = null;
-		// try {
-		//
-		// FileInputStream f_in = new FileInputStream(filePath);
-		// ObjectInputStream obj_in = new ObjectInputStream(f_in);
-		// obj = obj_in.readObject();
-		//
-		// } catch (FileNotFoundException e) {
-		// logger.severe("PCA transformation matrix not found.");
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// logger
-		// .severe("Could not read from PCA transformation matrix file.");
-		// e.printStackTrace();
-		// } catch (ClassNotFoundException e) {
-		// logger
-		// .severe("Could not find class for PCA transformation matrix file.");
-		// e.printStackTrace();
-		// }
-		//
-		// if (obj instanceof Matrix) {
-		// this.pCMatrix = (Matrix) obj;
-		// } else {
-		// logger.severe("Failed to load transformation matrix from file.");
-		// }
-		this.pCMatrix = (Matrix) Util.readFromFile(filePath);
+	public static Matrix getMatrix(String filePath) {
+		return (Matrix) Util.readFromFile(filePath);
 	}
 
 	/**
-	 * Class constructor
 	 * 
 	 * @param imagesArray
 	 * @param length
 	 * @param nComponents
 	 * @param outputFilePath
+	 * @param overwrite
+	 * @return
 	 */
-	public PcaTransformMatrix(ArrayList<Object> imagesArray, int length,
+	public static Matrix getMatrix(ArrayList<Object> imagesArray, int length,
 			int nComponents, String outputFilePath, boolean overwrite) {
-		this.linearData = new double[imagesArray.size()][length];
+		double[][] linearData = new double[imagesArray.size()][length];
 
 		File outputFile = new File(outputFilePath);
 		if (!outputFile.getParentFile().exists()) {
 			outputFile.getParentFile().mkdirs();
 		}
 
+		Matrix pcaMatrix = null;
 		if (outputFile.exists() && !overwrite) {
 			logger.severe("PCA matrix file already exists.");
+			return getMatrix(outputFilePath);
 		} else {
 			try {
 				outputFile.createNewFile();
@@ -93,24 +67,22 @@ public class PcaTransformMatrix {
 				}
 				Matrix normalizedData = Util.normalizeMatrix(new Matrix(
 						linearData));
-				extractPrincipalComponents(nComponents, normalizedData);
-				this.pCMatrix = normalizedData;
+				
+				pcaMatrix = extractPrincipalComponents(nComponents, normalizedData);
 			}
 
-			Util.saveToFile(this.pCMatrix, outputFilePath);
+			Util.saveToFile(pcaMatrix, outputFilePath);
+			return pcaMatrix;
 		}
 	}
 
 	/**
-	 * Extract Principal components
 	 * 
 	 * @param nComponents
-	 *            number of components to extract
 	 * @param mCDataMatrix
-	 *            normalized matrix
-	 * @return Matrix
+	 * @return
 	 */
-	private void extractPrincipalComponents(int nComponents, Matrix mCDataMatrix) {
+	private static Matrix extractPrincipalComponents(int nComponents, Matrix mCDataMatrix) {
 		// Eigenvalues decomposition
 		logger.info("Extracting principal components...");
 		long startTime = System.currentTimeMillis();
@@ -150,8 +122,9 @@ public class PcaTransformMatrix {
 			count++;
 		}
 
-		this.pCMatrix = new Matrix(principalComponents);
+		
 		logger.info("Principal components extracted in "
 				+ (System.currentTimeMillis() - startTime) + "ms");
+		return new Matrix(principalComponents);
 	}
 }
