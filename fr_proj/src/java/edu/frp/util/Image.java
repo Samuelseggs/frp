@@ -60,7 +60,7 @@ public class Image {
 	 * @param bi
 	 * @throws IOException
 	 */
-	public Image (BufferedImage bi) throws IOException {
+	public Image (BufferedImage bi) {
 			this.width = bi.getWidth();
 			this.height = bi.getHeight();
 			this.type = bi.getType();
