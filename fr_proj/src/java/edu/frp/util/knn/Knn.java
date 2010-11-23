@@ -1,4 +1,4 @@
-package edu.frp.util;
+package edu.frp.util.knn;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 
 import Jama.Matrix;
 
-import edu.frp.util.knn.KnnClass;
-import edu.frp.util.knn.KnnResult;
 
 /**
  * @author Saulo (scsm@ecomp.poli.br)

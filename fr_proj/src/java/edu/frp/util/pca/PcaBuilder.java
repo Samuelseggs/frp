@@ -1,4 +1,4 @@
-package edu.frp.util;
+package edu.frp.util.pca;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import Jama.Matrix;
+import edu.frp.util.Image;
+import edu.frp.util.Util;
 import edu.frp.util.knn.KnnClass;
 
 /**

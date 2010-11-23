@@ -1,6 +1,8 @@
-package edu.frp.util;
+package edu.frp.util.pca;
 
 import java.util.logging.Logger;
+
+import edu.frp.util.Image;
 
 import Jama.Matrix;
 

@@ -1,4 +1,4 @@
-package edu.frp.util;
+package edu.frp.util.pca;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import Jama.Matrix;
 
+import edu.frp.util.Image;
+import edu.frp.util.Util;
+import edu.frp.util.knn.Knn;
 import edu.frp.util.knn.KnnClass;
 
 /**
